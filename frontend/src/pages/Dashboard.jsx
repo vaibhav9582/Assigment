@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { LogOut, LayoutDashboard, CheckSquare, Folder } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export default function Dashboard() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ export default function Dashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/dashboard/stats', {
+      const res = await axios.get(`${API_BASE}/api/dashboard/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStats(res.data);
@@ -31,7 +33,7 @@ export default function Dashboard() {
   const fetchProjects = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/projects', {
+      const res = await axios.get(`${API_BASE}/api/projects`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProjects(res.data);
@@ -45,9 +47,9 @@ export default function Dashboard() {
       try {
         const token = localStorage.getItem('token');
         const [statsRes, tasksRes, projectsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/dashboard/stats', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:5000/api/tasks', { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get('http://localhost:5000/api/projects', { headers: { Authorization: `Bearer ${token}` } })
+          axios.get(`${API_BASE}/api/dashboard/stats`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_BASE}/api/tasks`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_BASE}/api/projects`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
         setStats(statsRes.data);
         setTasks(tasksRes.data);
@@ -81,7 +83,7 @@ export default function Dashboard() {
     }
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.put(`http://localhost:5000/api/projects/${editingProject._id}`, {
+      const res = await axios.put(`${API_BASE}/api/projects/${editingProject._id}`, {
         title: projectForm.title,
         description: projectForm.description
       }, {
@@ -98,7 +100,7 @@ export default function Dashboard() {
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/tasks/${taskId}/status`, { status: newStatus }, {
+      await axios.put(`${API_BASE}/api/tasks/${taskId}/status`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTasks(tasks.map(t => t._id === taskId ? { ...t, status: newStatus } : t));
@@ -121,7 +123,7 @@ export default function Dashboard() {
         project: newTask.projectId,
         dueDate: newTask.dueDate || undefined,
       };
-      const res = await axios.post('http://localhost:5000/api/tasks', payload, {
+      const res = await axios.post(`${API_BASE}/api/tasks`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const updatedTasks = [...tasks, res.data];
